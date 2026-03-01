@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>AI Precast Optimization Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#e9f0f7;
+margin:0;
+}
+
+/* HEADER */
+
+.header{
+background:#0b3d91;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.statusBar{
+background:#d4edda;
+color:#155724;
+padding:10px;
+text-align:center;
+font-weight:bold;
+}
+
+/* LAYOUT */
+
+.container{
+display:grid;
+grid-template-columns:30% 70%;
+gap:20px;
+padding:20px;
+}
+
+/* INPUT PANEL */
+
+.inputPanel{
+background:#dfeaf6;
+padding:20px;
+border-radius:10px;
+}
+
+.slider{width:100%;}
+label{font-weight:bold;}
+
+button{
+margin-top:15px;
+padding:12px;
+background:#0b3d91;
+color:white;
+border:none;
+cursor:pointer;
+width:100%;
+font-weight:bold;
+border-radius:6px;
+}
+
+/* CARDS */
+
+.card{
+background:white;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+}
+
+.value{
+font-size:22px;
+font-weight:bold;
+color:#0b3d91;
+}
+
+.good{color:#27ae60;}
+
+/* DIGITAL TWIN */
+
+#yard{display:flex;gap:10px;}
+
+.zone{
+flex:1;
+padding:35px;
+color:white;
+border-radius:8px;
+text-align:center;
+font-weight:bold;
+}
+
+.casting{background:#3498db;}
+.curing{background:#f39c12;}
+.ready{background:#7f8c8d;}
+.active-ready{background:#2ecc71;}
+
+/* AI COMPARISON CARD */
+
+.aiCard{
+width:380px;
+background:white;
+padding:15px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,0.15);
+margin:20px;
+}
+
+.aiCard canvas{
+height:150px !important;
+}
+
+.gain{
+color:#27ae60;
+font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>🚀 Autonomous AI System for Precast Cycle-Time Optimization</h2>
+<p>AI Decision Engine | Digital Twin | Yard Optimization</p>
+</div>
+
+<div class="statusBar">
+✅ AI Model Connected | Real-Time Optimization Active
+</div>
+
+<div class="container">
+
+<!-- INPUT -->
+<div class="inputPanel">
+
+<h3>📊 Dynamic Parameter Inputs</h3>
+
+<label>Temperature</label>
+<input type="range" min="20" max="45" value="32"
+id="tempSlider" class="slider">
+<span id="tempVal">32</span>
+
+<label>Humidity</label>
+<input type="range" min="40" max="90" value="60"
+id="humSlider" class="slider">
+<span id="humVal">60</span>
+
+<label>Water Cement Ratio</label>
+<input type="range" min="30" max="60" value="42"
+id="wcSlider" class="slider">
+<span id="wcVal">0.42</span>
+
+<label>Curing Time</label>
+<input type="range" min="12" max="48" value="24"
+id="curingSlider" class="slider">
+<span id="curingVal">24</span>
+
+<button onclick="runManualAI()">⚡ Run AI Optimization</button>
+
+</div>
+
+<!-- OUTPUT -->
+<div>
+
+<div class="card">
+<h3>🧠 AI Model Prediction</h3>
+
+<div class="grid">
+<div>Temp<div id="temp" class="value"></div></div>
+<div>Humidity<div id="hum" class="value"></div></div>
+<div>Strength<div id="strength" class="value good"></div></div>
+<div>Cycle<div id="cycle" class="value"></div></div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>⚡ Autonomous AI Decision</h3>
+
+<p>Safe Demould:
+<b id="demould">--</b></p>
+
+<p>Production Gain:
+<b id="gainText">--</b></p>
+
+<p>AI Status:
+<b id="statusText">Waiting...</b></p>
+
+</div>
+
+<div class="card">
+<h3>🏭 Digital Twin – Precast Yard</h3>
+
+<div id="yard">
+<div class="zone casting">Casting</div>
+<div class="zone curing">Curing</div>
+<div class="zone ready">Waiting</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- AI VS TRADITIONAL -->
+<div class="aiCard">
+
+<h4>📊 AI vs Traditional Production Performance</h4>
+
+<canvas id="comparisonChart"></canvas>
+
+<p>Traditional : <b>48 hrs</b></p>
+<p>AI Optimized : <b id="aiCycle">--</b></p>
+<p class="gain">Efficiency : <b id="improvement">--</b></p>
+
+</div>
+
+<script>
+
+const TRADITIONAL=48;
+
+/* sliders */
+tempSlider.oninput=()=>tempVal.innerText=tempSlider.value;
+humSlider.oninput=()=>humVal.innerText=humSlider.value;
+wcSlider.oninput=()=>wcVal.innerText=(wcSlider.value/100).toFixed(2);
+curingSlider.oninput=()=>curingVal.innerText=curingSlider.value;
+
+/* chart */
+
+let comparisonChart=new Chart(
+document.getElementById("comparisonChart"),
+{
+type:"bar",
+data:{
+labels:["Traditional","AI Optimized"],
+datasets:[{
+data:[48,0],
+backgroundColor:[
+"#2E86DE",   // BLUE
+"#F39C12"    // ORANGE
+]
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+scales:{y:{beginAtZero:true}}
+}
+});
+
+/* twin */
+
+function updateTwin(time){
+let ready=document.querySelector(".ready");
+
+if(time<=14){
+ready.classList.add("active-ready");
+ready.innerText="✅ Ready For Demould";
+}else{
+ready.classList.remove("active-ready");
+ready.innerText="Curing";
+}
+}
+
+/* MAIN AI */
+
+async function runManualAI(){
+
+try{
+
+statusText.innerText="🔄 AI Optimizing...";
+
+let t=tempSlider.value;
+let h=humSlider.value;
+let wc=wcSlider.value/100;
+let curing=curingSlider.value;
+
+let res=await fetch(
+`/predict?temperature=${t}&humidity=${h}&w_c_ratio=${wc}&cement_type=1&curing_time=${curing}`,
+{method:"POST"}
+);
+
+if(!res.ok) throw "API Error";
+
+let d=await res.json();
+
+/* KPI */
+
+temp.innerText=t+" °C";
+hum.innerText=h+" %";
+strength.innerText=d.pred_strength.toFixed(1)+" MPa";
+cycle.innerText=d.cycle_time.toFixed(1)+" hrs";
+
+demould.innerText=d.curing_time+" hrs";
+
+/* gain */
+
+let efficiency=
+((TRADITIONAL-d.cycle_time)/TRADITIONAL)*100;
+
+gainText.innerText=
+efficiency.toFixed(1)+" % Faster";
+
+/* AI status */
+
+if(d.cycle_time>40)
+statusText.innerText="⚠ Production Delay Risk";
+else if(d.cycle_time>32)
+statusText.innerText="🟡 Moderate Optimization";
+else
+statusText.innerText="✅ Ready For Demould";
+
+/* twin */
+
+updateTwin(d.curing_time);
+
+/* comparison */
+
+aiCycle.innerText=
+d.cycle_time.toFixed(1)+" hrs";
+
+improvement.innerText=
+efficiency.toFixed(1)+" % Faster";
+
+comparisonChart.data.datasets[0].data=
+[48,d.cycle_time];
+
+comparisonChart.update();
+
+}
+catch(e){
+statusText.innerText="❌ Prediction Failed";
+alert("AI Optimization Failed");
+console.error(e);
+}
+
+}
+
+</script>
+</body>
+</html>
