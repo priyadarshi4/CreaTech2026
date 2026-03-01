@@ -44,7 +44,7 @@ Traditional methods rely on static curing assumptions, causing delays and ineffi
 | Category         | Technology            |
 | ---------------- | --------------------- |
 | Backend          | FastAPI               |
-| Machine Learning | Scikit-Learn, XGBoost(For testing)  |
+| Machine Learning | Scikit-Learn, regression,XGBoost,CNN,RNN  |
 | Data Processing  | Pandas, NumPy         |
 | Frontend         | HTML, CSS, JavaScript |
 | Visualization    | Chart.js              |
